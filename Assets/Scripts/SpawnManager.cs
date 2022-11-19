@@ -6,7 +6,10 @@ public class SpawnManager : MonoBehaviour
 {
     public GameObject stdGround;
     public GameObject chargedGround;
+    public GameObject enemyPrefab;
+    
     public Vector2 spawnPosition;
+    public Vector2 enemyOffset;
     
     private PlayerController playerControllerScript;
     
@@ -24,6 +27,7 @@ public class SpawnManager : MonoBehaviour
         
     }
 
+    //TEST ENVIRONMENT
     IEnumerator TestGround()
     { 
         while(true)
@@ -31,6 +35,11 @@ public class SpawnManager : MonoBehaviour
             Instantiate(chargedGround, spawnPosition, Quaternion.identity);
             yield return new WaitForSeconds(2);
             Instantiate(stdGround, spawnPosition, Quaternion.identity);
+            yield return new WaitForSeconds(2);
+            Instantiate(chargedGround, spawnPosition, Quaternion.identity);
+            yield return new WaitForSeconds(2);
+            Instantiate(stdGround, spawnPosition, Quaternion.identity);
+            Instantiate(enemyPrefab, spawnPosition + enemyOffset, Quaternion.identity);
             yield return new WaitForSeconds(2);
         }
     }

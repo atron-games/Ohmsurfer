@@ -6,7 +6,7 @@ public class PlayerController : MonoBehaviour
 {
     //INPUT PARAMETERS
     private float tapThreshold = 0.075f;
-    private float doubleMaxInterval = 0.1f;
+    private float doubleMaxInterval = 0.05f;
     private bool checkingForDouble = false;
     private bool isDouble = false;
 
@@ -16,6 +16,8 @@ public class PlayerController : MonoBehaviour
     public float jetpackForce;
     private bool isOnGround = false;
     public float charge = 1;
+    public GameObject projectile;
+    private int hitPoints;
 
     //GAME PARAMETERS
     public bool gameOver = false;
@@ -77,7 +79,7 @@ public class PlayerController : MonoBehaviour
             if(isOnGround)
             {
                 Jump();
-                break;
+                yield return new WaitForSeconds(.2f);
             }
             
             JetPack();
@@ -90,6 +92,12 @@ public class PlayerController : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D collision)
     {
         isOnGround = true;
+
+        if (collision.collider.tag == "Enemy" || collision.collider.tag == "Enemy Projectile")
+        {
+            Destroy(collision.gameObject);
+            hitPoints--;
+        }
     }
 
     private void OnCollisionStay2D(Collision2D collision)
@@ -125,7 +133,7 @@ public class PlayerController : MonoBehaviour
         if(charge >= 1)
         {
             charge = charge - 1;
-            Debug.Log("Pew Pew");
+            Instantiate(projectile, transform.position + new Vector3(1,0,0), Quaternion.identity);
         }
     }
 
