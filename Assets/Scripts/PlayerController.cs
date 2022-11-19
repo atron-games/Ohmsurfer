@@ -53,7 +53,7 @@ public class PlayerController : MonoBehaviour
             }
             
             JetPack();
-            yield return 0;
+            yield return new WaitForEndOfFrame();
         }
     }
 
@@ -92,8 +92,9 @@ public class PlayerController : MonoBehaviour
     {
         if(charge > 0)
         {
-            charge -= Time.deltaTime;
-            playerRb.AddForce(Vector2.up * jetpackForce, ForceMode2D.Force);
+            float t = Time.deltaTime;
+            charge -= t;
+            playerRb.AddForce(Vector2.up * jetpackForce * t, ForceMode2D.Force);
         }
     }
 
