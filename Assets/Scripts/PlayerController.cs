@@ -14,14 +14,25 @@ public class PlayerController : MonoBehaviour
     private bool isOnGround = false;
     public float charge = 1;
     public GameObject projectile;
+
     private int hitPoints = 3;
 
     //GAME PARAMETERS
     public bool gameOver = false;
-    
+
+    //PARTICLES
+    public GameObject electricParticleObject;
+    private ParticleSystem electricParticle;
+    public GameObject jetpackParticleObject;
+    private ParticleSystem jetpackParticle;
+
     void Start()
     {
         playerRb = GetComponent<Rigidbody2D>();
+        electricParticle = electricParticleObject.GetComponent<ParticleSystem>();
+        electricParticle.Play();
+        jetpackParticle = jetpackParticleObject.GetComponent<ParticleSystem>();
+        jetpackParticle.Play();
     }
 
     void Update()
@@ -63,6 +74,9 @@ public class PlayerController : MonoBehaviour
             JetPack();
             yield return new WaitForEndOfFrame();
         }
+
+        var emission = jetpackParticle.emission;
+        emission.rateOverTime = 0;
     }
 
     //COLLISION
@@ -75,6 +89,12 @@ public class PlayerController : MonoBehaviour
             Destroy(collision.gameObject);
             hitPoints--;
             hpCheck();
+        }
+
+        if(collision.collider.CompareTag("Electric"))
+        {
+            var emission = electricParticle.emission;
+            emission.rateOverTime = 40;
         }
     }
 
@@ -89,6 +109,9 @@ public class PlayerController : MonoBehaviour
     private void OnCollisionExit2D(Collision2D collision)
     {
         isOnGround = false;
+
+        var emission = electricParticle.emission;
+        emission.rateOverTime = 0;
     }
 
     private void OOBCheck()
@@ -112,6 +135,9 @@ public class PlayerController : MonoBehaviour
             float t = Time.deltaTime;
             charge -= t;
             playerRb.AddForce(Vector2.up * jetpackForce * t, ForceMode2D.Force);
+
+            var emission = jetpackParticle.emission;
+            emission.rateOverTime = 20;
         }
     }
 
