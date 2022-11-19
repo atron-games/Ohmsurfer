@@ -5,7 +5,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     //INPUT PARAMETERS
-    private float tapThreshold = 0.075f;
+    private float tapThreshold = 0.1f;
 
     //PLAYER PARAMETERS
     private Rigidbody2D playerRb;
