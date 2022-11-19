@@ -14,7 +14,7 @@ public class PlayerController : MonoBehaviour
     private bool isOnGround = false;
     public float charge = 1;
     public GameObject projectile;
-    private int hitPoints;
+    private int hitPoints = 3;
 
     //GAME PARAMETERS
     public bool gameOver = false;
@@ -25,6 +25,14 @@ public class PlayerController : MonoBehaviour
     }
 
     void Update()
+    {
+        InputCheck();
+        OOBCheck();
+    }
+
+
+    //USER INPUT
+    private void InputCheck()
     {
         if (Input.GetKeyDown(KeyCode.Space) && gameOver == false)
         {
@@ -66,6 +74,7 @@ public class PlayerController : MonoBehaviour
         {
             Destroy(collision.gameObject);
             hitPoints--;
+            hpCheck();
         }
     }
 
@@ -80,6 +89,14 @@ public class PlayerController : MonoBehaviour
     private void OnCollisionExit2D(Collision2D collision)
     {
         isOnGround = false;
+    }
+
+    private void OOBCheck()
+    {
+        if(transform.position.y < -6)
+        {
+            gameOver = true;
+        }
     }
 
     //CHARACTER ACTIONS
@@ -113,6 +130,23 @@ public class PlayerController : MonoBehaviour
         {
             charge += 2*Time.deltaTime;
             playerRb.WakeUp();
+        }
+    }
+
+    void hpCheck()
+    {
+        if(hitPoints == 2)
+        {
+            GameObject.Find("HP3").SetActive(false);
+        }
+        else if(hitPoints == 1)
+        {
+            GameObject.Find("HP2").SetActive(false);
+        }
+        else if(hitPoints == 0)
+        {
+            GameObject.Find("HP1").SetActive(false);
+            gameOver = true;
         }
     }
 }

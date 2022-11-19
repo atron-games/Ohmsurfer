@@ -16,9 +16,8 @@ public class SpawnManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        StartCoroutine(TestGround());
-
         playerControllerScript = GameObject.Find("Player").GetComponent<PlayerController>();
+        StartCoroutine(TestGround());
     }
 
     // Update is called once per frame
@@ -30,7 +29,7 @@ public class SpawnManager : MonoBehaviour
     //TEST ENVIRONMENT
     IEnumerator TestGround()
     { 
-        while(true)
+        while(playerControllerScript.gameOver == false)
         {
             Instantiate(chargedGround, spawnPosition, Quaternion.identity);
             yield return new WaitForSeconds(2);
