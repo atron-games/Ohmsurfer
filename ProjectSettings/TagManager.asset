@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Electric
   - Ground
+  - Background
   layers:
   - Default
   - TransparentFX

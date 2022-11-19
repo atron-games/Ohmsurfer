@@ -15,8 +15,11 @@ public class PlayerController : MonoBehaviour
     public float jumpForce;
     public float jetpackForce;
     private bool isOnGround = false;
-    public float charge = 0;
+    public float charge = 1;
 
+    //GAME PARAMETERS
+    public bool gameOver = false;
+    
     void Start()
     {
         playerRb = GetComponent<Rigidbody2D>();
@@ -24,12 +27,10 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && checkingForDouble == false)
+        if (Input.GetKeyDown(KeyCode.Space) && checkingForDouble == false && gameOver == false)
         {
             StartCoroutine(TapInput());
         }
-
-        Debug.Log(charge);
     }
 
     IEnumerator TapInput()
@@ -73,6 +74,12 @@ public class PlayerController : MonoBehaviour
         //FLOAT IF THE BUTTON IS HELD DOWN
         while (Input.GetKey(KeyCode.Space) && checkingForDouble == false)
         {
+            if(isOnGround)
+            {
+                Jump();
+                break;
+            }
+            
             JetPack();
             yield return 0;
         }
@@ -124,7 +131,7 @@ public class PlayerController : MonoBehaviour
 
     void ChargeUp()
     {
-        if(charge <= 5)
+        if(charge <= 3)
         {
             charge += Time.deltaTime;
             playerRb.WakeUp();
