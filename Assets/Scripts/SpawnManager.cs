@@ -38,7 +38,7 @@ public class SpawnManager : MonoBehaviour
             Instantiate(chargedGround, spawnPosition, Quaternion.identity);
             yield return new WaitForSeconds(2);
             Instantiate(stdGround, spawnPosition, Quaternion.identity);
-            Instantiate(enemyPrefab, spawnPosition + enemyOffset, Quaternion.identity);
+            //Instantiate(enemyPrefab, spawnPosition + enemyOffset, Quaternion.identity);
             yield return new WaitForSeconds(2);
         }
     }
