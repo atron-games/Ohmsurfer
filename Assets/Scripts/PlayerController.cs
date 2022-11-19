@@ -6,9 +6,6 @@ public class PlayerController : MonoBehaviour
 {
     //INPUT PARAMETERS
     private float tapThreshold = 0.075f;
-    private float doubleMaxInterval = 0.05f;
-    private bool checkingForDouble = false;
-    private bool isDouble = false;
 
     //PLAYER PARAMETERS
     private Rigidbody2D playerRb;
@@ -29,7 +26,7 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && checkingForDouble == false && gameOver == false)
+        if (Input.GetKeyDown(KeyCode.Space) && gameOver == false)
         {
             StartCoroutine(TapInput());
         }
@@ -40,52 +37,24 @@ public class PlayerController : MonoBehaviour
         //GIVE THE USER A MOMENT TO LET GO IF TAPPING
         yield return new WaitForSeconds(tapThreshold);
 
-        //IF THE USER LET GO (TAP)
+        //TAP
         if (Input.GetKey(KeyCode.Space) == false)
         {
-            //CHECK FOR DOUBLE TAP
-            checkingForDouble = true;
-            isDouble = false;
-            float t = 0;
-
-            while(t < doubleMaxInterval)
-            {
-                t += Time.deltaTime;
-               
-                //SHOOT IF IT IS A DOUBLE TAP
-                if (Input.GetKeyDown(KeyCode.Space))
-                {
-                    Shoot();
-                    isDouble = true;
-                    break;
-                }
-                yield return t;
-            }
-
-            //JUMP IF IT'S NOT A DOUBLE AND YOU ARE ON THE GROUND
-            if (isOnGround && isDouble == false)
-            {
-                Jump();
-            }
-
-            //WAIT A LITTLE BIT SO WE DONT START FLOATING DURING THE DOUBLE TAP
-            yield return new WaitForSeconds(.1f);
-            checkingForDouble = false;
+            Shoot();
         }
 
-        //FLOAT IF THE BUTTON IS HELD DOWN
-        while (Input.GetKey(KeyCode.Space) && checkingForDouble == false)
+        //HOLD
+        while (Input.GetKey(KeyCode.Space))
         {
             if(isOnGround)
             {
                 Jump();
-                yield return new WaitForSeconds(.2f);
+                yield return new WaitForSeconds(.2f); //Dont turn the jetpack on instantly after jumping
             }
             
             JetPack();
             yield return 0;
         }
-
     }
 
     //COLLISION
@@ -93,7 +62,7 @@ public class PlayerController : MonoBehaviour
     {
         isOnGround = true;
 
-        if (collision.collider.tag == "Enemy" || collision.collider.tag == "Enemy Projectile")
+        if (collision.collider.CompareTag("Enemy") || collision.collider.CompareTag("Enemy Projectile"))
         {
             Destroy(collision.gameObject);
             hitPoints--;
@@ -102,7 +71,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnCollisionStay2D(Collision2D collision)
     {
-        if (collision.collider.tag == "Electric")
+        if (collision.collider.CompareTag("Electric"))
         {
             ChargeUp();
         }
@@ -141,7 +110,7 @@ public class PlayerController : MonoBehaviour
     {
         if(charge <= 3)
         {
-            charge += Time.deltaTime;
+            charge += 2*Time.deltaTime;
             playerRb.WakeUp();
         }
     }
