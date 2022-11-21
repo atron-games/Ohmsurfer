@@ -12,7 +12,10 @@ public class SpawnManager : MonoBehaviour
     public Vector2 enemyOffset;
     
     private PlayerController playerControllerScript;
-    
+
+    public float bossSpawnTime;
+    public GameObject bossPrefab;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -23,13 +26,16 @@ public class SpawnManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (Time.time == bossSpawnTime)
+        {
+            Instantiate(bossPrefab, new Vector2(12, 0), Quaternion.identity);
+        }
     }
 
     //TEST ENVIRONMENT
     IEnumerator TestGround()
     { 
-        while(playerControllerScript.gameOver == false)
+        while(playerControllerScript.gameOver == false && playerControllerScript.bossKilled == false)
         {
             Instantiate(chargedGround, spawnPosition, Quaternion.identity);
             yield return new WaitForSeconds(2);

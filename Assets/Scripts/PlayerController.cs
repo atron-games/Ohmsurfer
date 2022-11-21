@@ -19,6 +19,7 @@ public class PlayerController : MonoBehaviour
 
     //GAME PARAMETERS
     public bool gameOver = false;
+    public bool bossKilled;
 
     //PARTICLES
     public GameObject electricParticleObject;
@@ -154,7 +155,7 @@ public class PlayerController : MonoBehaviour
     {
         if(charge <= 3)
         {
-            charge += 2*Time.deltaTime;
+            charge += 3*Time.deltaTime;
             playerRb.WakeUp();
         }
     }
