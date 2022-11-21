@@ -12,7 +12,7 @@ public class PlayerController : MonoBehaviour
     public float jumpForce;
     public float jetpackForce;
     private bool isOnGround = false;
-    public float charge = 1;
+    public float charge;
     public GameObject projectile;
 
     private int hitPoints = 3;
