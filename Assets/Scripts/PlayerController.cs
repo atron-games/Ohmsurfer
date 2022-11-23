@@ -50,19 +50,12 @@ public class PlayerController : MonoBehaviour
         jetpackParticle = jetpackParticleObject.GetComponent<ParticleSystem>();
         jetpackParticle.Play();
         animator = GetComponent<Animator>();
+
+        StartCoroutine("Startup");
     }
 
     void Update()
     {
-        if(gameStarted == false)
-        {
-            if(Input.GetKeyUp(KeyCode.Space))
-            {
-                gameStarted = true;
-                pressStart.SetActive(false);
-            }
-        }
-        
         if(gameStarted == true)
         {
             InputCheck();
@@ -81,6 +74,21 @@ public class PlayerController : MonoBehaviour
             {
                 SceneManager.LoadScene(0);
             }
+        }
+    }
+
+    IEnumerator Startup()
+    {
+        yield return new WaitForSeconds(1);
+        
+        while (gameStarted == false)
+        {
+            if (Input.GetKeyUp(KeyCode.Space))
+            {
+                gameStarted = true;
+                pressStart.SetActive(false);
+            }
+            yield return null;
         }
     }
 
