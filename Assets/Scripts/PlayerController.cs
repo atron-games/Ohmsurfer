@@ -16,7 +16,7 @@ public class PlayerController : MonoBehaviour
     public float charge;
     public GameObject projectile;
 
-    private int hitPoints = 4;
+    private int hitPoints = 5;
 
     //GAME PARAMETERS
     public bool gameStarted;
@@ -36,6 +36,10 @@ public class PlayerController : MonoBehaviour
     //UI Elements
     public GameObject pressStart;
     public GameObject restartText;
+
+    //AUDIO ELEMENTS
+    public AudioSource playerAudio;
+    public AudioClip shootAudio;
 
     void Start()
     {
@@ -210,6 +214,7 @@ public class PlayerController : MonoBehaviour
     {
         if(charge >= 1)
         {
+            playerAudio.PlayOneShot(shootAudio);
             animator.SetBool("isShooting", true);
             charge = charge - 1;
             Instantiate(projectile, transform.position + new Vector3(1,0,0), Quaternion.identity);
@@ -235,7 +240,12 @@ public class PlayerController : MonoBehaviour
 
     void hpCheck()
     {
-        if (hitPoints == 3)
+
+        if (hitPoints == 4)
+        {
+            GameObject.Find("HP5").SetActive(false);
+        }
+        else if (hitPoints == 3)
         {
             GameObject.Find("HP4").SetActive(false);
         }

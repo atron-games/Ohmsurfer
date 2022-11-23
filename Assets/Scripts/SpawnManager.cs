@@ -47,24 +47,14 @@ public class SpawnManager : MonoBehaviour
         //STANDARD RANDOMIZED SPAWNING
         while(true)
         {
-            while (playerControllerScript.gameOver == false && Time.timeSinceLevelLoad <= realSpawnTime - 4)
+            while (playerControllerScript.gameStarted == true && playerControllerScript.gameOver == false && Time.timeSinceLevelLoad <= realSpawnTime - 2)
             {
-                yield return new WaitForSeconds(Random.Range(2, 3));
-
                 int buildingIndex = Random.Range(0, 3);
-
                 Instantiate(buildings[buildingIndex], new Vector2(20, Random.Range(-7, -3)), Quaternion.identity);
-            }
-
-            if (Time.timeSinceLevelLoad <= realSpawnTime - 2 == true)
-            {
-                break;
+                yield return new WaitForSeconds(Random.Range(2, 3));
             }
 
             yield return null;
         }
-
-        
-        yield return null;
     }
 }
