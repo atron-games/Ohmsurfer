@@ -4,48 +4,67 @@ using UnityEngine;
 
 public class SpawnManager : MonoBehaviour
 {
-    public GameObject stdGround;
-    public GameObject chargedGround;
-    public GameObject enemyPrefab;
-    
-    public Vector2 spawnPosition;
-    public Vector2 enemyOffset;
-    
     private PlayerController playerControllerScript;
+    
+    public GameObject[] buildings;
+  
+    public GameObject bossPrefab;
+    public GameObject bossPlatform;
+    private bool bossSpawned = false;
 
     public float bossSpawnTime;
-    public GameObject bossPrefab;
+    private float spawnOffset;
+    private float realSpawnTime;
 
     // Start is called before the first frame update
     void Start()
     {
         playerControllerScript = GameObject.Find("Player").GetComponent<PlayerController>();
-        StartCoroutine(TestGround());
+        StartCoroutine(StandardSpawning());
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Time.time == bossSpawnTime)
+        if(playerControllerScript.gameStarted == false)
         {
+            spawnOffset = Time.timeSinceLevelLoad;
+        }
+
+        realSpawnTime = bossSpawnTime + spawnOffset;
+
+        if (playerControllerScript.gameOver == false && Time.timeSinceLevelLoad >= realSpawnTime && bossSpawned == false && playerControllerScript.gameStarted == true)
+        {
+            bossSpawned = true;
             Instantiate(bossPrefab, new Vector2(12, 0), Quaternion.identity);
+            Instantiate(bossPlatform, new Vector2(-5, -9.5f), Quaternion.identity);
         }
     }
 
     //TEST ENVIRONMENT
-    IEnumerator TestGround()
-    { 
-        while(playerControllerScript.gameOver == false && playerControllerScript.bossKilled == false)
+    IEnumerator StandardSpawning()
+    {
+        //STANDARD RANDOMIZED SPAWNING
+        while(true)
         {
-            Instantiate(chargedGround, spawnPosition, Quaternion.identity);
-            yield return new WaitForSeconds(2);
-            Instantiate(stdGround, spawnPosition, Quaternion.identity);
-            yield return new WaitForSeconds(2);
-            Instantiate(chargedGround, spawnPosition, Quaternion.identity);
-            yield return new WaitForSeconds(2);
-            Instantiate(stdGround, spawnPosition, Quaternion.identity);
-            //Instantiate(enemyPrefab, spawnPosition + enemyOffset, Quaternion.identity);
-            yield return new WaitForSeconds(2);
+            while (playerControllerScript.gameOver == false && Time.timeSinceLevelLoad <= realSpawnTime - 4)
+            {
+                yield return new WaitForSeconds(Random.Range(2, 3));
+
+                int buildingIndex = Random.Range(0, 3);
+
+                Instantiate(buildings[buildingIndex], new Vector2(20, Random.Range(-7, -3)), Quaternion.identity);
+            }
+
+            if (Time.timeSinceLevelLoad <= realSpawnTime - 2 == true)
+            {
+                break;
+            }
+
+            yield return null;
         }
+
+        
+        yield return null;
     }
 }

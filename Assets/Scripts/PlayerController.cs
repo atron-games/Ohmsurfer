@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -11,14 +12,16 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D playerRb;
     public float jumpForce;
     public float jetpackForce;
-    private bool isOnGround = false;
+    private bool isOnGround;
     public float charge;
     public GameObject projectile;
 
-    private int hitPoints = 3;
+    private int hitPoints = 4;
 
     //GAME PARAMETERS
-    public bool gameOver = false;
+    public bool gameStarted;
+    public bool gameOver;
+    public bool bossAlive;
     public bool bossKilled;
 
     //PARTICLES
@@ -27,26 +30,65 @@ public class PlayerController : MonoBehaviour
     public GameObject jetpackParticleObject;
     private ParticleSystem jetpackParticle;
 
+    //ANIMATIONS
+    public Animator animator;
+
+    //UI Elements
+    public GameObject pressStart;
+    public GameObject restartText;
+
     void Start()
     {
+        isOnGround = false;
+        gameStarted = false;
+        gameOver = false;
+        bossAlive = false;
+
         playerRb = GetComponent<Rigidbody2D>();
         electricParticle = electricParticleObject.GetComponent<ParticleSystem>();
         electricParticle.Play();
         jetpackParticle = jetpackParticleObject.GetComponent<ParticleSystem>();
         jetpackParticle.Play();
+        animator = GetComponent<Animator>();
     }
 
     void Update()
     {
-        InputCheck();
-        OOBCheck();
+        if(gameStarted == false)
+        {
+            if(Input.GetKeyUp(KeyCode.Space))
+            {
+                gameStarted = true;
+                pressStart.SetActive(false);
+            }
+        }
+        
+        if(gameStarted == true)
+        {
+            InputCheck();
+            OOBCheck();
+
+            if (bossKilled == true)
+            {
+                var emission = electricParticle.emission;
+                emission.rateOverTime = 0;
+            }
+        }
+
+        if(gameOver == true)
+        {
+            if (Input.GetKeyUp(KeyCode.Space))
+            {
+                SceneManager.LoadScene(0);
+            }
+        }
     }
 
 
     //USER INPUT
     private void InputCheck()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && gameOver == false)
+        if (Input.GetKeyDown(KeyCode.Space) && gameOver == false && bossKilled == false)
         {
             StartCoroutine(TapInput());
         }
@@ -64,7 +106,7 @@ public class PlayerController : MonoBehaviour
         }
 
         //HOLD
-        while (Input.GetKey(KeyCode.Space))
+        while (Input.GetKey(KeyCode.Space) && bossKilled == false)
         {
             if(isOnGround)
             {
@@ -74,7 +116,10 @@ public class PlayerController : MonoBehaviour
             
             JetPack();
             yield return new WaitForEndOfFrame();
+            animator.SetBool("isFloating", true);
         }
+
+        animator.SetBool("isFloating", false);
 
         var emission = jetpackParticle.emission;
         emission.rateOverTime = 0;
@@ -84,26 +129,35 @@ public class PlayerController : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D collision)
     {
         isOnGround = true;
+        animator.SetBool("isJumping", false);
 
         if (collision.collider.CompareTag("Enemy") || collision.collider.CompareTag("Enemy Projectile"))
         {
+            animator.SetBool("isHurt", true);
             Destroy(collision.gameObject);
             hitPoints--;
             hpCheck();
-        }
-
-        if(collision.collider.CompareTag("Electric"))
-        {
-            var emission = electricParticle.emission;
-            emission.rateOverTime = 40;
+            StartCoroutine("AnimOff");
         }
     }
 
     private void OnCollisionStay2D(Collision2D collision)
     {
-        if (collision.collider.CompareTag("Electric"))
+        isOnGround = true;
+
+        if (collision.collider.CompareTag("Electric") && gameOver == false && bossKilled == false)
         {
+            var emission = electricParticle.emission;
+            emission.rateOverTime = 40;
+            
+            electricParticleObject.transform.position = new Vector2(electricParticleObject.transform.position.x, collision.transform.position.y);
             ChargeUp();
+        }
+
+        if (collision.collider.CompareTag("BuildingSide"))
+        {
+            hitPoints = 0;
+            gameOver = true;
         }
     }
 
@@ -120,6 +174,7 @@ public class PlayerController : MonoBehaviour
         if(transform.position.y < -6)
         {
             gameOver = true;
+            restartText.SetActive(true);
         }
     }
 
@@ -127,6 +182,7 @@ public class PlayerController : MonoBehaviour
     void Jump()
     {
         playerRb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+        animator.SetBool("isJumping", true);
     }
 
     void JetPack()
@@ -146,14 +202,23 @@ public class PlayerController : MonoBehaviour
     {
         if(charge >= 1)
         {
+            animator.SetBool("isShooting", true);
             charge = charge - 1;
             Instantiate(projectile, transform.position + new Vector3(1,0,0), Quaternion.identity);
+            StartCoroutine("AnimOff");
         }
+    }
+
+    IEnumerator AnimOff()
+    {
+        yield return new WaitForSeconds(.3f);
+        animator.SetBool("isShooting", false);
+        animator.SetBool("isHurt", false);
     }
 
     void ChargeUp()
     {
-        if(charge <= 3)
+        if(charge <= 5)
         {
             charge += 3*Time.deltaTime;
             playerRb.WakeUp();
@@ -162,7 +227,11 @@ public class PlayerController : MonoBehaviour
 
     void hpCheck()
     {
-        if(hitPoints == 2)
+        if (hitPoints == 3)
+        {
+            GameObject.Find("HP4").SetActive(false);
+        }
+        else if (hitPoints == 2)
         {
             GameObject.Find("HP3").SetActive(false);
         }
@@ -173,7 +242,9 @@ public class PlayerController : MonoBehaviour
         else if(hitPoints == 0)
         {
             GameObject.Find("HP1").SetActive(false);
+            animator.SetBool("isDead", true);
             gameOver = true;
+            restartText.SetActive(true);
         }
     }
 }

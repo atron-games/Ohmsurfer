@@ -18,6 +18,7 @@ public class BossBehaviour2 : MonoBehaviour
     private bool doneShooting;
 
     private int phase = 0;
+    private bool invertedRoutine = false;
     private bool routineRunning = false;
     public bool bossKilled = false;
 
@@ -29,6 +30,7 @@ public class BossBehaviour2 : MonoBehaviour
     void Start()
     {
         pcScript = GameObject.Find("Player").GetComponent<PlayerController>();
+        pcScript.bossAlive = true;
         bossHP = bossMaxHP;
         phaseBreakHP = bossMaxHP / 2;
 
@@ -40,7 +42,6 @@ public class BossBehaviour2 : MonoBehaviour
     {
         PositionCheck();
         //GetInputs();
-        Debug.Log(phase);
     }
 
     //DEBUG MANUAL INPUTS
@@ -183,7 +184,14 @@ public class BossBehaviour2 : MonoBehaviour
         {
             if(routineRunning == false)
             {
-                StartCoroutine("RoutineA");
+                if(invertedRoutine == false)
+                {
+                    StartCoroutine("RoutineA");
+                }
+                else
+                {
+                    StartCoroutine("RoutineAInverted");
+                }
             }
 
             if (bossHP <= phaseBreakHP)
@@ -206,7 +214,14 @@ public class BossBehaviour2 : MonoBehaviour
         {
             if (routineRunning == false)
             {
-                StartCoroutine("RoutineB");
+                if (invertedRoutine == false)
+                {
+                    StartCoroutine("RoutineB");
+                }
+                else
+                {
+                    StartCoroutine("RoutineBInverted");
+                }
             }
 
             if (bossHP <= phaseBreakHP)
@@ -334,10 +349,100 @@ public class BossBehaviour2 : MonoBehaviour
             if (t >= 3) { break; }
         }
 
+        invertedRoutine = true;
         routineRunning = false;
         yield break;
     }
-    
+
+    IEnumerator RoutineAInverted()
+    {
+        routineRunning = true;
+
+        float t = 0;
+        shots = 5;
+        shotTimer = .5f;
+
+        StartCoroutine("MoveToBottom");
+
+        while (true)
+        {
+            if (bossHP <= phaseBreakHP) { break; }
+            if (atBottom)
+            {
+                StartCoroutine("BurstFire");
+                break;
+            }
+            yield return null;
+        }
+
+        while (true)
+        {
+            if (bossHP <= phaseBreakHP) { break; }
+            if (doneShooting)
+            {
+                StartCoroutine("MoveToMiddle");
+                break;
+            }
+            yield return null;
+        }
+
+        while (true)
+        {
+            if (bossHP <= phaseBreakHP) { break; }
+            if (inMiddle)
+            {
+                StartCoroutine("BurstFire");
+                break;
+            }
+            yield return null;
+        }
+
+        while (true)
+        {
+            if (bossHP <= phaseBreakHP) { break; }
+            if (doneShooting)
+            {
+                StartCoroutine("MoveToTop");
+                break;
+            }
+            yield return null;
+        }
+
+        while (true)
+        {
+            if (bossHP <= phaseBreakHP) { break; }
+            if (atTop)
+            {
+                StartCoroutine("BurstFire");
+                break;
+            }
+            yield return null;
+        }
+
+
+        while (true)
+        {
+            if (bossHP <= phaseBreakHP) { break; }
+            if (doneShooting)
+            {
+                StartCoroutine("MoveToMiddle");
+                break;
+            }
+            yield return null;
+        }
+
+        while (bossHP > phaseBreakHP)
+        {
+            t += Time.deltaTime;
+            yield return new WaitForEndOfFrame();
+            if (t >= 3) { break; }
+        }
+
+        invertedRoutine = false;
+        routineRunning = false;
+        yield break;
+    }
+
     IEnumerator RoutineB()
     {
         routineRunning = true;
@@ -386,6 +491,59 @@ public class BossBehaviour2 : MonoBehaviour
             if(t >= 3) { break; }
         }
 
+        invertedRoutine = true;
+        routineRunning = false;
+        yield break;
+    }
+    IEnumerator RoutineBInverted()
+    {
+        routineRunning = true;
+
+        float t = 0;
+        shots = 8;
+        shotTimer = 12 / bossMoveSpeed;
+
+        StartCoroutine("MoveToBottom");
+
+        while (true)
+        {
+            if (atBottom)
+            {
+                StartCoroutine("BurstFire");
+                StartCoroutine("MoveToTop");
+                break;
+            }
+            yield return null;
+        }
+
+        while (true)
+        {
+            if (atTop)
+            {
+                StartCoroutine("MoveToBottom");
+                break;
+            }
+            yield return null;
+        }
+
+        while (true)
+        {
+            if (atBottom)
+            {
+                StartCoroutine("MoveToMiddle");
+                break;
+            }
+            yield return null;
+        }
+
+        while (bossHP > phaseBreakHP)
+        {
+            t += Time.deltaTime;
+            yield return new WaitForEndOfFrame();
+            if (t >= 3) { break; }
+        }
+
+        invertedRoutine = false;
         routineRunning = false;
         yield break;
     }

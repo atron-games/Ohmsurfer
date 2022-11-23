@@ -11,7 +11,7 @@ public class EnemyBehaviour : MonoBehaviour
     void Start()
     {
         playerControllerScript = GameObject.Find("Player").GetComponent<PlayerController>();
-        InvokeRepeating("Shoot", Random.Range(1, 2), Random.Range(1.5f, 3));
+        InvokeRepeating("Shoot", Random.Range(3, 4), Random.Range(1.5f, 3));
     }
 
     // Update is called once per frame

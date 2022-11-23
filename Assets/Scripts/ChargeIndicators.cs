@@ -37,6 +37,6 @@ public class ChargeIndicators : MonoBehaviour
         }
 
         
-        rend.material.color = new Color(r, g, 0, 1);
+        rend.material.color = new Color(1, 1, 1, g);
     }
 }
